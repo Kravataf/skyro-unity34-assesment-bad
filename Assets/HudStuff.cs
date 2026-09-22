@@ -3,36 +3,14 @@ using UnityEngine.UI;
 
 public class HudStuff : MonoBehaviour
 {
-    public Text txt;
-    public Text txt2;
-    public string last;
-
-    public void upd(string s)
-    {
-        last = s;
-        if (txt != null)
-        {
-            txt.text = s;
-        }
-    }
-
-    public void setScore(int n)
-    {
-        if (txt2 != null)
-        {
-            txt2.text = "" + n;
-        }
-    }
+    [SerializeField] private Text textHP, textScore;
+    [SerializeField] private GameObject deathScreen;
 
     void Update()
     {
-        // TODO hook this to gm
-        if (txt == null)
-        {
-            var go = GameObject.Find("HPText");
-            if (go != null) txt = go.GetComponent<Text>();
-        }
+        textHP.text    = (gm.inst.player.hp > 0) ? $"HP: {gm.inst.player.hp}" : "You died!";
+        textScore.text = $"Score: {gm.inst.score}";
 
-        txt2.text = $"score: {gm.inst.score}";
+        deathScreen.SetActive(gm.inst.player.hp <= 0);
     }
 }

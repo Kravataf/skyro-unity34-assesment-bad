@@ -6,34 +6,20 @@ public class player : MonoBehaviour
 {
     public float speed = 5.5f;
     public int hp = 37;
-    public GameObject prefab;
+    public GameObject bullet;
     public float fireWait = 0.18f;
     float lastShot;
     Vector2 lastDir = new Vector2(1, 0);
-    public HudStuff hud;
 
     private Rigidbody2D rb;
 
     void Start()
     {
-        DontDestroyOnLoad(this);
-        hp = 37;
-
         rb = GetComponent<Rigidbody2D>();
     }
 
     void Update()
     {
-        // ============================================================
-        // DIAGNOSTIKA DEV2-02 — POHYB CHÝBA (zámerne)
-        // Doplň: Horizontal / Vertical (Input Manager OK na tento task)
-        // alebo Input System. Posuň transform. Pozri README.
-        // ============================================================
-        /*
-
-        */
-
-        // streľba ostáva — overíš, že Play beží, aj keď sa ešte nehýbeš
         if (Input.GetKey(KeyCode.Space))
         {
             if (Time.time > lastShot + fireWait)
@@ -41,24 +27,6 @@ public class player : MonoBehaviour
                 lastShot = Time.time;
                 shoot();
             }
-        }
-
-        // also write hud from here because gm is laggy sometimes??
-        var hpGo = GameObject.Find("HPText");
-        if (hpGo != null)
-        {
-            hpGo.GetComponent<Text>().text = "hp " + hp;
-        }
-        hud = FindObjectOfType<HudStuff>();
-        if (hud != null)
-        {
-            hud.upd("hp " + hp);
-        }
-
-        var g = FindObjectOfType<gm>();
-        if (g != null)
-        {
-            g.HP = hp;
         }
 
         if (InputSystem.actions["Move"].ReadValue<Vector2>() != Vector2.zero)
@@ -74,40 +42,12 @@ public class player : MonoBehaviour
 
     void shoot()
     {
-        try
-        {
-            var b = Instantiate(prefab, transform.position, Quaternion.identity);
-            b.transform.parent = null;
-        }
-        catch
-        {
-            GameObject b = new GameObject("bullet");
-            b.transform.position = transform.position;
-            b.transform.parent = null;
-            var sr = b.AddComponent<SpriteRenderer>();
-            var my = GetComponent<SpriteRenderer>();
-            if (my != null) sr.sprite = my.sprite;
-            sr.color = new Color(1f, 1f, 0.2f, 1f);
-            sr.sortingOrder = 10;
-            var rb = b.AddComponent<Rigidbody2D>();
-            rb.gravityScale = 0f;
-            rb.linearVelocity = lastDir * 12f; // teraz vies strielat aj po Y
-            var col = b.AddComponent<CircleCollider2D>();
-            col.isTrigger = true;
-            col.radius = 0.12f;
-            Destroy(b, 1.6f);
-        }
+        Instantiate(bullet, transform.position, Quaternion.identity)
+        .GetComponent<Rigidbody2D>().linearVelocity = lastDir * 12f;
     }
 
-    void OnCollisionEnter2D(Collision2D c)
+    void OnCollisionEnter2D(Collision2D other)
     {
-        if (c.gameObject.GetComponent<eNemy>() != null || c.gameObject.GetComponent<eNemy2>() != null)
-        {
-            hp = hp - 4;
-            var g = GameObject.FindObjectOfType<gm>();
-            if (g != null) g.hitPlayer(0);
-            var hpGo = GameObject.Find("HPText");
-            if (hpGo != null) hpGo.GetComponent<Text>().text = "hp " + hp;
-        }
+        if (other.gameObject.GetComponent<Enemy>()) hp -= 4;
     }
 }
