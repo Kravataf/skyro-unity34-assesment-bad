@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 public class player : MonoBehaviour
@@ -11,10 +12,14 @@ public class player : MonoBehaviour
     float lastDir = 1f;
     public HudStuff hud;
 
+    private Rigidbody2D rb;
+
     void Start()
     {
         DontDestroyOnLoad(this);
         hp = 37;
+
+        rb = GetComponent<Rigidbody2D>();
     }
 
     void Update()
@@ -55,6 +60,15 @@ public class player : MonoBehaviour
         {
             g.HP = hp;
         }
+    }
+
+    private void FixedUpdate()
+    {
+        rb.linearVelocity = new Vector3(
+            InputSystem.actions["Move"].ReadValue<Vector2>().x,
+            InputSystem.actions["Move"].ReadValue<Vector2>().y,
+            0
+        ) * speed;
     }
 
     void shoot()
