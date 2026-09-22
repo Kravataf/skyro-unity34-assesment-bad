@@ -9,7 +9,7 @@ public class player : MonoBehaviour
     public GameObject prefab;
     public float fireWait = 0.18f;
     float lastShot;
-    float lastDir = 1f;
+    Vector2 lastDir = new Vector2(1, 0);
     public HudStuff hud;
 
     private Rigidbody2D rb;
@@ -60,15 +60,16 @@ public class player : MonoBehaviour
         {
             g.HP = hp;
         }
+
+        if (InputSystem.actions["Move"].ReadValue<Vector2>() != Vector2.zero)
+        {
+            lastDir = InputSystem.actions["Move"].ReadValue<Vector2>().normalized;
+        }
     }
 
     private void FixedUpdate()
     {
-        rb.linearVelocity = new Vector3(
-            InputSystem.actions["Move"].ReadValue<Vector2>().x,
-            InputSystem.actions["Move"].ReadValue<Vector2>().y,
-            0
-        ) * speed;
+        rb.linearVelocity = InputSystem.actions["Move"].ReadValue<Vector2>().normalized * speed;
     }
 
     void shoot()
@@ -90,7 +91,7 @@ public class player : MonoBehaviour
             sr.sortingOrder = 10;
             var rb = b.AddComponent<Rigidbody2D>();
             rb.gravityScale = 0f;
-            rb.linearVelocity = new Vector2(lastDir * 12f, 0f);
+            rb.linearVelocity = lastDir * 12f; // teraz vies strielat aj po Y
             var col = b.AddComponent<CircleCollider2D>();
             col.isTrigger = true;
             col.radius = 0.12f;

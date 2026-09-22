@@ -32,5 +32,7 @@ public class HudStuff : MonoBehaviour
             var go = GameObject.Find("HPText");
             if (go != null) txt = go.GetComponent<Text>();
         }
+
+        txt2.text = $"score: {gm.inst.score}";
     }
 }

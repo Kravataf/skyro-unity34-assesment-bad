@@ -42,6 +42,7 @@ public class eNemy : MonoBehaviour
                 // Po opravenej kolízii (DEV2-03) enemy zomrie, ale score
                 // nerastie, kým nezavoláš gm.addScore / napojíš ScoreText.
                 // ============================================================
+                gm.inst.addScore(1);
                 Destroy(gameObject);
             }
         }
